@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해외 일정표</title>
+<style>
+*{box-sizing:border-box;}
+body{
+  font-family:Arial,sans-serif;
+  background:linear-gradient(180deg,#f9f7fb 0%,#f7fbf7 100%);
+  margin:0;
+  padding:16px;
+  color:#334155;
+}
+#login{
+  max-width:340px;
+  margin:110px auto;
+  text-align:center;
+  background:#fff;
+  border:1px solid #eadfe6;
+  border-radius:20px;
+  padding:28px 22px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+#login p{margin:0 0 14px;font-size:18px;}
+#pw{
+  width:100%;
+  height:44px;
+  border:1px solid #d8dbe2;
+  border-radius:12px;
+  padding:0 12px;
+  font-size:16px;
+  margin-bottom:10px;
+}
+.container{
+  max-width:980px;
+  margin:auto;
+  background:#ffffff;
+  border:1px solid #ebe5ea;
+  padding:18px;
+  border-radius:24px;
+  box-shadow:0 14px 40px rgba(105,88,111,0.08);
+}
+.topbar{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.section-bar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  padding:12px;
+  margin-bottom:12px;
+  border:1px solid #ece7ec;
+  border-radius:16px;
+  background:#fcfbfd;
+}
+button,.file-label{
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:15px;
+  transition:.18s ease;
+}
+button:hover,.file-label:hover{transform:translateY(-1px);}
+button.primary{background:#7c6f83;color:#fff;}
+button.secondary,.file-label{background:#eef1f4;color:#334155;}
+button.spring{background:#f8dfe9;color:#7b4d61;}
+button.edit-accent{background:#e8f3ea;color:#35624b;}
+button.emoji-btn{background:#fff2d8;color:#8a5a14;}
+.hidden{display:none !important;}
+#fileInput{display:none;}
+#mainTitle{
+  margin:10px 0 16px;
+  font-size:30px;
+  line-height:1.35;
+  outline:none;
+}
+.day{
+  border:1px solid #ebe4e7;
+  border-radius:18px;
+  margin-bottom:16px;
+  overflow:hidden;
+  background:#fffdfd;
+}
+.day-header{
+  padding:14px 16px;
+  cursor:pointer;
+  background:linear-gradient(90deg,#ffe8ef 0%,#eef8f0 100%);
+  font-weight:bold;
+  font-size:18px;
+  outline:none;
+}
+.day-body{display:none;padding:14px;}
+.field-title{
+  font-size:15px;
+  margin:10px 0 6px;
+  color:#52606d;
+}
+input[type="text"], input[type="password"], input.maplink, .plain-input, select{
+  width:100%;
+  min-height:42px;
+  border:1px solid #d9dee5;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:16px;
+  background:#fff;
+}
+.row{
+  display:grid;
+  grid-template-columns:1fr 140px;
+  gap:8px;
+  align-items:center;
+}
+@media (max-width:700px){
+  .row{grid-template-columns:1fr;}
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #dfe4ea;
+  padding:10px 8px;
+  vertical-align:top;
+  font-size:16px;
+}
+th{background:#f7f9fb;}
+img{
+  max-width:100%;
+  resize:both;
+  overflow:auto;
+  border-radius:12px;
+  margin-top:8px;
+}
+.collapsible{
+  background:#f4f6f8;
+  padding:10px 12px;
+  border-radius:12px;
+  margin-top:10px;
+  cursor:pointer;
+}
+.content{
+  display:none;
+  border:1px solid #e4e8ed;
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+  margin-top:8px;
+}
+.editable{
+  outline:none;
+  min-height:22px;
+}
+[contenteditable="true"]{
+  box-shadow:inset 0 0 0 2px #e9efe8;
+  border-radius:8px;
+  padding:4px 6px;
+  background:#fcfefc;
+}
+.editable.edit-target{
+  box-shadow:inset 0 0 0 2px #d5e4d3;
+}
+iframe{
+  width:100%;
+  height:220px;
+  border:none;
+  border-radius:12px;
+  margin-top:8px;
+  background:#f8fafc;
+}
+.editor-toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.editor-toolbar select,
+.editor-toolbar input[type="color"]{
+  width:auto;
+}
+#emojiPanel{
+  position:absolute;
+  z-index:9999;
+  width:280px;
+  height:280px;
+  overflow-y:auto;
+  border:1px solid #ebdfc3;
+  background:#fffdfa;
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 14px 32px rgba(120,95,50,0.16);
+}
+.emoji-group{margin-bottom:12px;}
+.emoji-group-title{font-size:14px;color:#7c6a47;margin-bottom:6px;}
+.emoji-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.emoji-item{
+  width:40px;
+  height:40px;
+  font-size:22px;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid #eee5d3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.note{
+  font-size:13px;
+  color:#64748b;
+}
+
+.export-modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.25);
+  display:none; align-items:center; justify-content:center; z-index:9999;
+}
+.export-modal{
+  width:min(92vw, 380px);
+  background:#fffafc; border:1px solid #f2d6e1; border-radius:18px;
+  box-shadow:0 18px 40px rgba(0,0,0,.14);
+  padding:22px 18px 16px;
+}
+.export-modal-title{
+  font-size:20px; font-weight:700; margin:0 0 10px; color:#5a4b52;
+}
+.export-modal-desc{
+  font-size:14px; line-height:1.6; color:#6d5a62; margin:0 0 16px;
+}
+.export-modal-actions{
+  display:flex; gap:10px; justify-content:flex-end;
+}
+.export-confirm{
+  background:#f4b8cc; color:#4f3340; border:none;
+  border-radius:12px; padding:10px 16px; font-weight:700; cursor:pointer;
+}
+.export-cancel{
+  background:#fff; color:#6d5a62; border:1px solid #e4cfd7;
+  border-radius:12px; padding:10px 16px; font-weight:700; cursor:pointer;
+}
+
+</style>
+
+<script type="module">
+  // ===== Firebase 실시간 공유 설정 =====
+  // 아래 firebaseConfig 값만 본인 프로젝트 값으로 바꾸면 바로 연결돼.
+  // roomId는 비밀번호 0729를 그대로 사용해 같은 방 데이터로 동기화되게 했어.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = window.FIREBASE_CONFIG || {
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+
+  const hasFirebaseConfig = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+  let db = null;
+  let sharedDocRef = null;
+  let suppressRemoteApply = false;
+
+  if (hasFirebaseConfig) {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    const roomId = "0729";
+    sharedDocRef = doc(db, "travel_planner_rooms", roomId);
+
+    window.startRealtimeSync = function startRealtimeSync() {
+      onSnapshot(sharedDocRef, (snap) => {
+        if (!snap.exists()) return;
+        const remote = snap.data();
+        if (!remote || !remote.payload) return;
+        suppressRemoteApply = true;
+        try {
+          if (typeof applyImportedData === "function") {
+            applyImportedData(remote.payload);
+          }
+        } finally {
+          setTimeout(() => suppressRemoteApply = false, 150);
+        }
+      });
+    };
+
+    window.pushSharedState = async function pushSharedState() {
+      if (!sharedDocRef) return;
+      if (suppressRemoteApply) return;
+      if (typeof getCurrentData !== "function") return;
+      const payload = getCurrentData();
+      await setDoc(sharedDocRef, {
+        payload,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    };
+  } else {
+    window.startRealtimeSync = function(){};
+    window.pushSharedState = async function(){};
+  }
+
+  window.hasFirebaseConfig = hasFirebaseConfig;
+</script>
+
+</head>
+<body>
+
+<div id="syncNotice" style="display:none; margin:10px 16px; padding:12px 14px; border-radius:14px; background:#fff7fa; border:1px solid #f1d5df; color:#6c5661; font-size:14px; line-height:1.55;">
+  이 파일은 실시간 공유형 버전이야. Firebase 설정값을 넣으면 같은 파일/같은 링크를 연 사람끼리 내용이 자동 동기화돼.
+</div>
+
+<div id="login">
+  <p>비밀번호 입력</p>
+  <input type="password" id="pw" inputmode="numeric" enterkeyhint="go" placeholder="비밀번호 4자리">
+  <button id="enterBtn" type="button" onclick="login()">입장</button>
+  <p id="msg" class="note" style="margin-top:10px;color:#d46a8a;min-height:20px;"></p>
+</div>
+
+<div id="app" class="hidden">
+  <div class="container">
+    <div class="topbar">
+      <button class="primary" id="editToggleBtn" onclick="toggleEdit()">수정</button>
+      <div id="editActionBar" class="hidden" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="edit-accent" onclick="save()">저장</button>
+        <button class="spring" onclick="addDay()" id="addDayBtn">날짜 추가</button>
+      </div>
+      <button class="secondary" onclick="openExportConfirm()">공유저장</button>
+    </div>
+
+    <div id="formatBar" class="section-bar hidden">
+      <div class="editor-toolbar">
+        <button class="secondary" type="button" onclick="format('bold')">굵게</button>
+        <button class="secondary" type="button" onclick="format('underline')">밑줄</button>
+        <input type="color" onchange="colorText(this.value)" title="글자색">
+        <select onchange="fontSize(this.value)">
+          <option value="">글자 크기</option>
+          <option value="1">1pt</option><option value="2">2pt</option><option value="3">3pt</option><option value="4">4pt</option><option value="5">5pt</option>
+          <option value="6">6pt</option><option value="7">7pt</option><option value="8">8pt</option><option value="9">9pt</option><option value="10">10pt</option>
+          <option value="11">11pt</option><option value="12">12pt</option><option value="13">13pt</option><option value="14">14pt</option><option value="15">15pt</option>
+          <option value="16">16pt</option><option value="17">17pt</option><option value="18">18pt</option><option value="19">19pt</option><option value="20">20pt</option>
+        </select>
+        <button class="emoji-btn" type="button" onclick="toggleEmojiPanel()">이모티콘</button>
+      </div>
+    </div>
+
+    <div id="emojiPanel" class="hidden">
+      <div class="emoji-group">
+        <div class="emoji-group-title">하트</div>
+        <div class="emoji-list" id="emojiHeart"></div>
+      </div>
+      <div class="emoji-group">
+        <div class="emoji-group-title">강조</div>
+        <div class="emoji-list" id="emojiEmphasis"></div>
+      </div>
+      <div class="emoji-group">
+        <div class="emoji-group-title">기본</div>
+        <div class="emoji-list" id="emojiBasic"></div>
+      </div>
+      <div class="note">편집 중일 때 원하는 위치에 커서를 두고 눌러서 넣으면 돼.</div>
+    </div>
+
+    <h1 id="mainTitle" class="editable" contenteditable="false">해외 일정표</h1>
+    <div id="days"></div>
+  </div>
+</div>
+
+<script id="sharedData" type="application/json">{"title":"해외 일정표","days":""}</script>
+
+
+<div id="exportModalBackdrop" class="export-modal-backdrop" onclick="closeExportConfirm(event)">
+  <div class="export-modal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle" onclick="event.stopPropagation()">
+    <p id="exportModalTitle" class="export-modal-title">공유 저장하시겠습니까?</p>
+    <p class="export-modal-desc">(확인을 누를 시 현재 내용이 공유 상태로 저장됩니다.)</p>
+    <div class="export-modal-actions">
+      <button type="button" class="export-cancel" onclick="closeExportConfirm()">취소</button>
+      <button type="button" class="export-confirm" onclick="exportData()">공유저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+async function syncSharedStateSafe(){
+  try{
+    if (typeof pushSharedState === "function") {
+      await pushSharedState();
+    }
+  }catch(err){
+    console.error("실시간 저장 실패", err);
+  }
+}
+
+
+const PASSWORD = "0729";
+let editMode = false;
+let savedRange = null;
+let activeEditable = null;
+
+function getCurrentData(){
+  return {
+    days: document.getElementById('days').innerHTML,
+    title: document.getElementById('mainTitle').innerHTML
+  };
+}
+
+function setCurrentData(data){
+  document.getElementById('days').innerHTML = data.days || '';
+  document.getElementById('mainTitle').innerHTML = data.title || '해외 일정표';
+}
+
+function getEmbeddedData(){
+  const el = document.getElementById('sharedData');
+  if(!el) return null;
+  try{
+    return JSON.parse(el.textContent || '{}');
+  }catch(e){
+    return null;
+  }
+}
+
+
+const emojiData = {
+  heart:["🩷","❤️","🧡","💛","💚","🩵","💙","💜","🖤","🩶","🤍","🤎","💖","💕","💓","💗"],
+  emphasis:["❣️","❕","❔","✨","〰️","👍🏻","🫶🏻","⚡️","💦","❌","❗️","❓","💯","✅","✔️","☑️"],
+  basic:["😊","🥹","😂","😭","😎","🥰","🙌","👏","🔥","🌸","✈️","📅","📍","📝","🎟️","💸"]
+};
+
+function login(){
+  const pwInput = document.getElementById('pw');
+  const msg = document.getElementById('msg');
+  const p = (pwInput.value || '').trim();
+  if(p === PASSWORD){
+    msg.innerText = '';
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').classList.remove('hidden');
+    renderEmojiPanel();
+    load();
+  }else{
+    msg.innerText = '비밀번호가 틀렸어. 다시 확인해줘.';
+    pwInput.focus();
+    pwInput.select();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const pwInput = document.getElementById('pw');
+  if(pwInput){
+    pwInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        login();
+      }
+    });
+  }
+});
+
+
+function setActiveEditable(el){
+  document.querySelectorAll('.editable.edit-target').forEach(item => item.classList.remove('edit-target'));
+  activeEditable = el || null;
+  if(activeEditable) activeEditable.classList.add('edit-target');
+}
+
+function positionEmojiPanel(){
+  const panel = document.getElementById('emojiPanel');
+  if(!panel || panel.classList.contains('hidden') || !activeEditable) return;
+  const rect = activeEditable.getBoundingClientRect();
+  const panelSize = 280;
+  const scrollY = window.scrollY;
+  const scrollX = window.scrollX;
+  let top = rect.top + scrollY - panelSize - 12;
+  if(top < scrollY + 10){
+    top = rect.bottom + scrollY + 12;
+  }
+  let left = rect.left + scrollX;
+  const maxLeft = scrollX + window.innerWidth - panelSize - 12;
+  if(left > maxLeft) left = Math.max(scrollX + 12, maxLeft);
+  if(left < scrollX + 12) left = scrollX + 12;
+  panel.style.top = top + 'px';
+  panel.style.left = left + 'px';
+}
+
+function toggleEdit(){
+  editMode = !editMode;
+
+  document.querySelectorAll('.editable').forEach(el => {
+    el.contentEditable = editMode;
+  });
+
+  document.querySelectorAll('.edit-only').forEach(el => {
+    el.classList.toggle('hidden', !editMode);
+  });
+
+  document.getElementById('formatBar').classList.toggle('hidden', !editMode);
+  document.getElementById('emojiPanel').classList.add('hidden');
+  if(!editMode) setActiveEditable(null);
+  document.getElementById('editActionBar').classList.toggle('hidden', !editMode);
+  document.getElementById('editToggleBtn').innerText = editMode ? '수정 종료' : '수정';
+}
+
+function rememberSelection(){
+  const sel = window.getSelection();
+  if(sel.rangeCount > 0){
+    savedRange = sel.getRangeAt(0).cloneRange();
+    const node = sel.anchorNode;
+    if(node){
+      const target = node.nodeType === 1 ? node.closest('.editable') : node.parentElement && node.parentElement.closest('.editable');
+      if(target) setActiveEditable(target);
+    }
+  }
+}
+
+document.addEventListener('selectionchange', () => {
+  if(editMode) rememberSelection();
+});
+
+document.addEventListener('mouseup', () => {
+  if(editMode) rememberSelection();
+});
+
+document.addEventListener('keyup', () => {
+  if(editMode) rememberSelection();
+});
+
+function restoreSelection(){
+  if(!savedRange) return false;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(savedRange);
+  return true;
+}
+
+function format(cmd){
+  restoreSelection();
+  document.execCommand(cmd, false, null);
+  rememberSelection();
+}
+
+function colorText(color){
+  restoreSelection();
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, color);
+  rememberSelection();
+}
+
+function fontSize(size){
+  if(!size) return;
+  restoreSelection();
+  const sel = window.getSelection();
+  if(!sel.rangeCount || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  span.style.fontSize = size + 'pt';
+  try{
+    range.surroundContents(span);
+  }catch(e){
+    const frag = range.extractContents();
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+  sel.removeAllRanges();
+  const newRange = document.createRange();
+  newRange.selectNodeContents(span);
+  sel.addRange(newRange);
+  savedRange = newRange.cloneRange();
+}
+
+function toggleEmojiPanel(){
+  if(!editMode) return;
+  const panel = document.getElementById('emojiPanel');
+  if(panel.classList.contains('hidden')){
+    if(!activeEditable){
+      const firstEditable = document.querySelector('.editable[contenteditable="true"]');
+      if(firstEditable) setActiveEditable(firstEditable);
+    }
+    positionEmojiPanel();
+    panel.classList.remove('hidden');
+    positionEmojiPanel();
+  }else{
+    panel.classList.add('hidden');
+  }
+}
+
+function renderEmojiPanel(){
+  makeEmojiButtons('emojiHeart', emojiData.heart);
+  makeEmojiButtons('emojiEmphasis', emojiData.emphasis);
+  makeEmojiButtons('emojiBasic', emojiData.basic);
+}
+
+function makeEmojiButtons(id, arr){
+  const box = document.getElementById(id);
+  box.innerHTML = '';
+  arr.forEach(item => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'emoji-item';
+    btn.textContent = item;
+    btn.onclick = () => insertEmoji(item);
+    box.appendChild(btn);
+  });
+}
+
+function insertEmoji(emoji){
+  restoreSelection();
+  document.execCommand('insertText', false, emoji);
+  rememberSelection();
+  positionEmojiPanel();
+}
+
+function addDay(){
+  const div = document.createElement('div');
+  div.className = 'day';
+  div.innerHTML = `
+    <div class="day-header editable">📅 1일차</div>
+    <div class="day-body">
+      <div class="field-title">지도 링크</div>
+      <div class="row">
+        <input class="maplink" type="text" placeholder="지도 링크 붙여넣기">
+        <button onclick="previewMap(this)" class="secondary" type="button">지도 미리보기</button>
+      </div>
+      <div class="map-preview"></div>
+
+      <div class="field-title">하루 예산</div>
+      <input class="plain-input" type="text" placeholder="예: 120,000원">
+
+      <div class="field-title">표 타입 선택</div>
+      <select onchange="changeLayout(this)">
+        <option value="A">A. 기본 일정표</option>
+        <option value="B">B. 블로그형</option>
+      </select>
+
+      <div class="schedule">
+        <table>
+          <tr>
+            <th>시간</th>
+            <th>일정</th>
+            <th>기타</th>
+          </tr>
+          <tr>
+            <td class="editable">09:00</td>
+            <td class="editable">일정</td>
+            <td class="editable"></td>
+          </tr>
+        </table>
+      </div>
+
+      <button onclick="addRow(this)" class="secondary edit-only hidden" type="button">칸 추가</button>
+
+      <div class="collapsible">□ 준비물</div>
+      <div class="content">
+        <div class="editable">내용 작성</div>
+        <input type="file" accept="image/*" onchange="addImage(event,this)">
+      </div>
+
+      <div class="collapsible">□ 티켓</div>
+      <div class="content">
+        <div class="editable"></div>
+        <input type="file" accept="image/*" onchange="addImage(event,this)">
+      </div>
+
+      <div class="collapsible">□ 예약 확인</div>
+      <div class="content">
+        <div class="editable"></div>
+        <input type="file" accept="image/*" onchange="addImage(event,this)">
+      </div>
+    </div>
+  `;
+  document.getElementById('days').appendChild(div);
+  if(editMode){
+    div.querySelectorAll('.editable').forEach(el => el.contentEditable = true);
+    div.querySelectorAll('.edit-only').forEach(el => el.classList.remove('hidden'));
+  }
+  init();
+}
+
+function changeLayout(sel){
+  const box = sel.parentNode.querySelector('.schedule');
+  if(sel.value === 'A'){
+    box.innerHTML = `
+      <table>
+        <tr>
+          <th>시간</th>
+          <th>일정</th>
+          <th>기타</th>
+        </tr>
+        <tr>
+          <td class="editable">09:00</td>
+          <td class="editable">일정</td>
+          <td class="editable"></td>
+        </tr>
+      </table>
+    `;
+  }else{
+    box.innerHTML = `
+      <div contenteditable="${editMode}" class="editable" style="min-height:120px;padding:12px;border:1px solid #dfe4ea;border-radius:12px;">
+        블로그처럼 글 작성 + 사진 첨부 가능
+      </div>
+      <input type="file" accept="image/*" onchange="addImage(event,this)" style="margin-top:10px;">
+    `;
+  }
+}
+
+function addImage(e,input){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    const img = document.createElement('img');
+    img.src = reader.result;
+    img.style.width = '220px';
+    img.onclick = function(){
+      const size = prompt('사진 너비(px)', img.style.width.replace('px',''));
+      if(size) img.style.width = size + 'px';
+    };
+    input.parentNode.appendChild(img);
+  };
+  reader.readAsDataURL(file);
+}
+
+function addRow(btn){
+  const table = btn.parentNode.querySelector('table');
+  if(!table) return;
+  const row = table.insertRow();
+  row.innerHTML = `
+    <td class="editable">시간</td>
+    <td class="editable">일정</td>
+    <td class="editable"></td>
+  `;
+  if(editMode){
+    row.querySelectorAll('.editable').forEach(el => el.contentEditable = true);
+  }
+}
+
+function previewMap(btn){
+  const link = btn.parentNode.querySelector('.maplink').value.trim();
+  if(!link) return;
+  const preview = btn.parentNode.parentNode.querySelector('.map-preview');
+  preview.innerHTML = `<iframe src="${link}"></iframe>`;
+}
+
+function init(){
+  document.querySelectorAll('.day-header').forEach(h => {
+    h.onclick = function(e){
+      if(editMode && e.target === this) rememberSelection();
+      const body = this.nextElementSibling;
+      body.style.display = body.style.display === 'block' ? 'none' : 'block';
+    };
+  });
+
+  document.querySelectorAll('.collapsible').forEach(el => {
+    el.onclick = function(){
+      const c = this.nextElementSibling;
+      c.style.display = c.style.display === 'block' ? 'none' : 'block';
+    };
+  });
+
+  document.querySelectorAll('.editable').forEach(el => {
+    el.contentEditable = editMode;
+    el.onfocus = function(){
+      if(editMode){
+        setActiveEditable(this);
+        positionEmojiPanel();
+      }
+    };
+    el.onclick = function(){
+      if(editMode){
+        setActiveEditable(this);
+        positionEmojiPanel();
+      }
+    };
+  });
+
+  document.querySelectorAll('.edit-only').forEach(el => {
+    el.classList.toggle('hidden', !editMode);
+  });
+}
+
+
+window.addEventListener('resize', positionEmojiPanel);
+window.addEventListener('scroll', positionEmojiPanel);
+
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('emojiPanel');
+  if(!panel || panel.classList.contains('hidden')) return;
+  if(panel.contains(e.target) || e.target.classList.contains('emoji-btn')) return;
+  if(e.target.closest('.editable')) return;
+  panel.classList.add('hidden');
+});
+
+function save(){
+  const data = getCurrentData();
+  localStorage.setItem('travelPlannerData', JSON.stringify(data));
+  alert('저장됨');
+}
+
+function load(){
+  const embedded = getEmbeddedData();
+  const raw = localStorage.getItem('travelPlannerData');
+
+  if(raw){
+    try{
+      setCurrentData(JSON.parse(raw));
+    }catch(e){
+      if(embedded){
+        setCurrentData(embedded);
+      }else{
+        document.getElementById('days').innerHTML = localStorage.getItem('travelPlannerData') || '';
+        document.getElementById('mainTitle').innerHTML = localStorage.getItem('travelPlannerTitle') || '해외 일정표';
+      }
+    }
+  }else if(embedded){
+    setCurrentData(embedded);
+  }else{
+    const oldData = localStorage.getItem('travelPlannerData');
+    const oldTitle = localStorage.getItem('travelPlannerTitle');
+    if(oldData) document.getElementById('days').innerHTML = oldData;
+    if(oldTitle) document.getElementById('mainTitle').innerHTML = oldTitle;
+  }
+
+  init();
+}
+
+
+function openExportConfirm(){
+  const modal = document.getElementById('exportModalBackdrop');
+  if(modal) modal.style.display = 'flex';
+}
+
+function closeExportConfirm(e){
+  if(e && e.target && e.target.id !== 'exportModalBackdrop') return;
+  const modal = document.getElementById('exportModalBackdrop');
+  if(modal) modal.style.display = 'none';
+}
+
+function exportData(){
+  closeExportConfirm();
+  syncSharedStateSafe();
+  const data = getCurrentData();
+  const clone = document.documentElement.cloneNode(true);
+
+  clone.querySelector('#login').style.display = '';
+  clone.querySelector('#app').classList.add('hidden');
+  clone.querySelector('#pw').value = '';
+  clone.querySelector('#msg').innerText = '';
+
+  const editActionBar = clone.querySelector('#editActionBar');
+  if(editActionBar) editActionBar.classList.add('hidden');
+  const formatBar = clone.querySelector('#formatBar');
+  if(formatBar) formatBar.classList.add('hidden');
+  const emojiPanel = clone.querySelector('#emojiPanel');
+  if(emojiPanel) emojiPanel.classList.add('hidden');
+  const editToggleBtn = clone.querySelector('#editToggleBtn');
+  if(editToggleBtn) editToggleBtn.innerText = '수정';
+
+  clone.querySelectorAll('[contenteditable="true"]').forEach(el => el.setAttribute('contenteditable','false'));
+
+  let shared = clone.querySelector('#sharedData');
+  if(!shared){
+    shared = document.createElement('script');
+    shared.id = 'sharedData';
+    shared.type = 'application/json';
+    clone.body.insertBefore(shared, clone.body.querySelector('script'));
+  }
+  shared.textContent = JSON.stringify(data).replace(/<\/script>/gi,'<\/script>');
+
+  const blob = new Blob([`<!DOCTYPE html>
+${clone.outerHTML}`], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'travel_planner_shared.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+</script>
+</body>
+</html>
